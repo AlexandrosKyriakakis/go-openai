@@ -16,8 +16,13 @@ func main() {
 		Model: openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: "you are a helpful chatbot",
+				Role: openai.ChatMessageRoleSystem,
+				Content: []openai.ChatMessageContent{
+					{
+						Type: openai.ChatMessageContentTypeText,
+						Text: "you are a helpful chatbot",
+					},
+				},
 			},
 		},
 	}
@@ -27,8 +32,13 @@ func main() {
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
 		req.Messages = append(req.Messages, openai.ChatCompletionMessage{
-			Role:    openai.ChatMessageRoleUser,
-			Content: s.Text(),
+			Role: openai.ChatMessageRoleUser,
+			Content: []openai.ChatMessageContent{
+				{
+					Type: openai.ChatMessageContentTypeText,
+					Text: s.Text(),
+				},
+			},
 		})
 		resp, err := client.CreateChatCompletion(context.Background(), req)
 		if err != nil {
@@ -36,7 +46,7 @@ func main() {
 			continue
 		}
 		fmt.Printf("%s\n\n", resp.Choices[0].Message.Content)
-		req.Messages = append(req.Messages, resp.Choices[0].Message)
+		req.Messages = append(req.Messages, resp.Choices[0].Message.ToChatCompleteMessage())
 		fmt.Print("> ")
 	}
 }

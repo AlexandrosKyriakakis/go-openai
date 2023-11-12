@@ -53,8 +53,13 @@ func TestAPI(t *testing.T) {
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Role: openai.ChatMessageRoleUser,
+					Content: []openai.ChatMessageContent{
+						{
+							Type: openai.ChatMessageContentTypeText,
+							Text: "Hello!",
+						},
+					},
 				},
 			},
 		},
@@ -68,9 +73,14 @@ func TestAPI(t *testing.T) {
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Name:    "John_Doe",
-					Content: "Hello!",
+					Role: openai.ChatMessageRoleUser,
+					Name: "John_Doe",
+					Content: []openai.ChatMessageContent{
+						{
+							Type: openai.ChatMessageContentTypeText,
+							Text: "Hello!",
+						},
+					},
 				},
 			},
 		},

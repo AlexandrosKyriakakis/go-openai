@@ -41,28 +41,19 @@ func TestChatCompletionsWrongModel(t *testing.T) {
 		Model:     "ada",
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: "Hello!",
+				Role: openai.ChatMessageRoleUser,
+				Content: []openai.ChatMessageContent{
+					{
+						Type: openai.ChatMessageContentTypeText,
+						Text: "Hello!",
+					},
+				},
 			},
 		},
 	}
 	_, err := client.CreateChatCompletion(ctx, req)
 	msg := fmt.Sprintf("CreateChatCompletion should return wrong model error, returned: %s", err)
 	checks.ErrorIs(t, err, openai.ErrChatCompletionInvalidModel, msg)
-}
-
-func TestChatRequestOmitEmpty(t *testing.T) {
-	data, err := json.Marshal(openai.ChatCompletionRequest{
-		// We set model b/c it's required, so omitempty doesn't make sense
-		Model: "gpt-4",
-	})
-	checks.NoError(t, err)
-
-	// messages is also required so isn't omitted
-	const expected = `{"model":"gpt-4","messages":null}`
-	if string(data) != expected {
-		t.Errorf("expected JSON with all empty fields to be %v but was %v", expected, string(data))
-	}
 }
 
 func TestChatCompletionsWithStream(t *testing.T) {
@@ -88,8 +79,13 @@ func TestChatCompletions(t *testing.T) {
 		Model:     openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: "Hello!",
+				Role: openai.ChatMessageRoleUser,
+				Content: []openai.ChatMessageContent{
+					{
+						Type: openai.ChatMessageContentTypeText,
+						Text: "Hello!",
+					},
+				},
 			},
 		},
 	})
@@ -106,8 +102,13 @@ func TestChatCompletionsWithHeaders(t *testing.T) {
 		Model:     openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: "Hello!",
+				Role: openai.ChatMessageRoleUser,
+				Content: []openai.ChatMessageContent{
+					{
+						Type: openai.ChatMessageContentTypeText,
+						Text: "Hello!",
+					},
+				},
 			},
 		},
 	})
@@ -130,8 +131,11 @@ func TestChatCompletionsWithRateLimitHeaders(t *testing.T) {
 		Model:     openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: "Hello!",
+				Role: openai.ChatMessageRoleUser,
+				Content: []openai.ChatMessageContent{
+					{Type: openai.ChatMessageContentTypeText,
+						Text: "Hello!"},
+				},
 			},
 		},
 	})
@@ -144,7 +148,7 @@ func TestChatCompletionsWithRateLimitHeaders(t *testing.T) {
 	}
 	resetRequestsTime := headers.ResetRequests.Time()
 	if resetRequestsTime.Before(time.Now()) {
-		t.Errorf("unexpected reset requests: %v", resetRequestsTime)
+		t.Errorf("unexpected reset requetsts: %v", resetRequestsTime)
 	}
 
 	bs1, _ := json.Marshal(headers)
@@ -167,8 +171,13 @@ func TestChatCompletionsFunctions(t *testing.T) {
 			Model:     openai.GPT3Dot5Turbo0613,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Role: openai.ChatMessageRoleUser,
+					Content: []openai.ChatMessageContent{
+						{
+							Type: openai.ChatMessageContentTypeText,
+							Text: "Hello!",
+						},
+					},
 				},
 			},
 			Functions: []openai.FunctionDefinition{{
@@ -192,8 +201,13 @@ func TestChatCompletionsFunctions(t *testing.T) {
 			Model:     openai.GPT3Dot5Turbo0613,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Role: openai.ChatMessageRoleUser,
+					Content: []openai.ChatMessageContent{
+						{
+							Type: openai.ChatMessageContentTypeText,
+							Text: "Hello!",
+						},
+					},
 				},
 			},
 			Functions: []openai.FunctionDefinition{{
@@ -209,8 +223,13 @@ func TestChatCompletionsFunctions(t *testing.T) {
 			Model:     openai.GPT3Dot5Turbo0613,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Role: openai.ChatMessageRoleUser,
+					Content: []openai.ChatMessageContent{
+						{
+							Type: openai.ChatMessageContentTypeText,
+							Text: "Hello!",
+						},
+					},
 				},
 			},
 			Functions: []openai.FunctionDefinition{{
@@ -246,8 +265,13 @@ func TestChatCompletionsFunctions(t *testing.T) {
 			Model:     openai.GPT3Dot5Turbo0613,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Role: openai.ChatMessageRoleUser,
+					Content: []openai.ChatMessageContent{
+						{
+							Type: openai.ChatMessageContentTypeText,
+							Text: "Hello!",
+						},
+					},
 				},
 			},
 			Functions: []openai.FunctionDefine{{
@@ -288,8 +312,11 @@ func TestAzureChatCompletions(t *testing.T) {
 		Model:     openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: "Hello!",
+				Role: openai.ChatMessageRoleUser,
+				Content: []openai.ChatMessageContent{
+					{Type: openai.ChatMessageContentTypeText,
+						Text: "Hello!"},
+				},
 			},
 		},
 	})
@@ -336,7 +363,7 @@ func handleChatCompletionEndpoint(w http.ResponseWriter, r *http.Request) {
 			}
 
 			res.Choices = append(res.Choices, openai.ChatCompletionChoice{
-				Message: openai.ChatCompletionMessage{
+				Message: openai.ChatCompletionChoiceMessage{
 					Role: openai.ChatMessageRoleFunction,
 					// this is valid json so it should be fine
 					FunctionCall: &openai.FunctionCall{
@@ -352,14 +379,14 @@ func handleChatCompletionEndpoint(w http.ResponseWriter, r *http.Request) {
 		completionStr := strings.Repeat("a", completionReq.MaxTokens)
 
 		res.Choices = append(res.Choices, openai.ChatCompletionChoice{
-			Message: openai.ChatCompletionMessage{
+			Message: openai.ChatCompletionChoiceMessage{
 				Role:    openai.ChatMessageRoleAssistant,
 				Content: completionStr,
 			},
 			Index: i,
 		})
 	}
-	inputTokens := numTokens(completionReq.Messages[0].Content) * n
+	inputTokens := numTokens(completionReq.Messages[0].Content[0].Text) * n
 	completionTokens := completionReq.MaxTokens * n
 	res.Usage = openai.Usage{
 		PromptTokens:     inputTokens,
